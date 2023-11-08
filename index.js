@@ -33,6 +33,17 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+// middleWares2
+
+const logger = (req, res, next) =>{
+  console.log('logger: info', req.method, req.url);
+  next();
+}
+
+
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -45,7 +56,7 @@ async function run() {
     
       // auth api
     
-    app.post('/jwt', async (req, res) => {
+    app.post('/jwt', logger , async (req, res) => {
       const user = req.body;
       console.log('user for token', user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
@@ -85,12 +96,12 @@ async function run() {
 
 
 
-// -------------------bookings-------------
+// --------booking rooms-----------
 
-app.get('/bookings', async (req, res) => {
+app.get('/bookings', logger, async (req, res) => {
     console.log(req.query.email);
     console.log('token owner info', req.user)
- 
+
     let query = {};
     if (req.query?.email) {
         query = { email: req.query.email }
@@ -108,12 +119,7 @@ app.post('/bookings', async (req, res) => {
 
 
 
-app.delete('/bookings/:id', async (req, res) => {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) }
-    const result = await bookingCollection.deleteOne(query);
-    res.send(result);
-})
+
 
 
 
