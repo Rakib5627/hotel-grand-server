@@ -42,6 +42,24 @@ const logger = (req, res, next) =>{
 }
 
 
+const verifyToken = (req, res, next) =>{
+  const token = req?.cookies?.token;
+  console.log('token in middleware', token);
+  // if no token available ------------
+  if(!token){
+      return res.status(401).send({message: 'unauthorized access'})
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) =>{
+      if(err){
+          return res.status(401).send({message: 'unauthorized access'})
+      }
+      req.user = decoded;
+      next();
+  })
+}
+
+
+
 
 
 async function run() {
@@ -98,10 +116,12 @@ async function run() {
 
 // --------booking rooms-----------
 
-app.get('/bookings', logger, async (req, res) => {
-    console.log(req.query.email);
+app.get('/bookings', logger, verifyToken , async (req, res) => {
+    console.log('query email llllllllll' , req.query.email);
     console.log('token owner info', req.user)
-
+    if(req.user.email !== req.query.email){
+        return res.status(403).send({message: 'forbidden access'})
+    }
     let query = {};
     if (req.query?.email) {
         query = { email: req.query.email }
@@ -118,8 +138,12 @@ app.post('/bookings', async (req, res) => {
 });
 
 
-
-
+app.delete('/bookings/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) }
+    const result = await bookingCollection.deleteOne(query);
+    res.send(result);
+})
 
 
 
