@@ -43,9 +43,9 @@ async function run() {
     // const userCollection = database.collection("user");
     const bookingCollection = database.collection("booking");      
     
-      // auth related api
+      // auth api
     
-    app.post('/jwt', logger, async (req, res) => {
+    app.post('/jwt', async (req, res) => {
       const user = req.body;
       console.log('user for token', user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
@@ -53,7 +53,6 @@ async function run() {
       res.cookie('token', token, {
           httpOnly: true,
           secure: true,
-          sameSite: 'none'
       })
           .send({ success: true });
   })
@@ -91,9 +90,7 @@ async function run() {
 app.get('/bookings', async (req, res) => {
     console.log(req.query.email);
     console.log('token owner info', req.user)
-    if(req.user.email !== req.query.email){
-        return res.status(403).send({message: 'forbidden access'})
-    }
+ 
     let query = {};
     if (req.query?.email) {
         query = { email: req.query.email }
@@ -109,19 +106,7 @@ app.post('/bookings', async (req, res) => {
     res.send(result);
 });
 
-// app.patch('/bookings/:id', async (req, res) => {
-//     const id = req.params.id;
-//     const filter = { _id: new ObjectId(id) };
-//     const updatedBooking = req.body;
-//     console.log(updatedBooking);
-//     const updateDoc = {
-//         $set: {
-//             status: updatedBooking.status
-//         },
-//     };
-//     const result = await bookingCollection.updateOne(filter, updateDoc);
-//     res.send(result);
-// })
+
 
 app.delete('/bookings/:id', async (req, res) => {
     const id = req.params.id;
