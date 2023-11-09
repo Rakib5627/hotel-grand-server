@@ -38,10 +38,10 @@ const client = new MongoClient(uri, {
 
 // middleWares2
 
-// const logger = (req, res, next) =>{
-//   console.log('logger: info', req.method, req.url);
-//   next();
-// }
+const logger = (req, res, next) =>{
+  console.log('logger: info', req.method, req.url);
+  next();
+}
 
 
 const verifyToken = (req, res, next) =>{
