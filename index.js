@@ -69,8 +69,8 @@ async function run() {
 
     const database = client.db("hotel");
     const roomsCollection = database.collection("rooms");
-    // const userCollection = database.collection("user");
     const bookingCollection = database.collection("booking");      
+    const reviewCollection = database.collection("reviews");
     
       // auth api
     
@@ -117,7 +117,7 @@ async function run() {
 // --------booking rooms-----------
 
 app.get('/bookings', logger, verifyToken , async (req, res) => {
-    console.log('query email llllllllll' , req.query.email);
+    console.log('query email lllllll' , req.query.email);
     console.log('token owner info', req.user)
     if(req.user.email !== req.query.email){
         return res.status(403).send({message: 'forbidden access'})
@@ -137,6 +137,20 @@ app.post('/bookings', async (req, res) => {
     res.send(result);
 });
 
+app.patch('/bookings/:id', async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: new ObjectId(id) };
+  const updatedBooking = req.body;
+  console.log(updatedBooking);
+  const updateDoc = {
+      $set: {
+          date: updatedBooking.date
+      },
+  };
+  const result = await bookingCollection.updateOne(filter, updateDoc);
+  res.send(result);
+})
+
 
 app.delete('/bookings/:id', async (req, res) => {
     const id = req.params.id;
@@ -145,6 +159,29 @@ app.delete('/bookings/:id', async (req, res) => {
     res.send(result);
 })
 
+
+// ---------------review--------------------------
+
+app.get('/reviews', async(req , res) => {
+  const cursor = reviewCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
+app.get('/reviews/:title', async(req , res) => {
+  const title = req.params.title;   
+  const cursor = reviewCollection.find({ title });
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
+
+app.post('/reviews', async (req, res) => {
+  const review = req.body;
+  console.log(review);
+  const result = await reviewCollection.insertOne(review);
+  res.send(result);
+});
 
 
 
