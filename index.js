@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000 ;
 
 app.use(cors({
   origin: [
-     
+      'http://localhost:5173',
       'https://hotel-website-2fba0.web.app' ,
       'https://hotel-website-2fba0.firebaseapp.com'
   ],
