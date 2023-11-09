@@ -11,7 +11,9 @@ const port = process.env.PORT || 5000 ;
 
 app.use(cors({
   origin: [
-      'http://localhost:5173'
+     
+      'https://hotel-website-2fba0.web.app' ,
+      'https://hotel-website-2fba0.firebaseapp.com'
   ],
   credentials: true
 }));
@@ -82,6 +84,7 @@ async function run() {
       res.cookie('token', token, {
           httpOnly: true,
           secure: true,
+          sameSite: 'none'
       })
           .send({ success: true });
   })
